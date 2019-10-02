@@ -1,5 +1,5 @@
 # RNAseq_preprocessing
-These are tutorials on a subset of tools available for processing raw RNAseq data. This is for two pipelines HISAT2_SAMtools_Stringtie_gffcompare_ballgown pipeline or HISAT2_SAMtools_Stringtie_PrepDEanalysis.py_DESeq2 pipeline. The first three steps are command line arguments and require installation of the following softwares.
+These are tutorials on a subset of tools available for processing raw RNAseq data. This is for two pipelines HISAT2_SAMtools_Stringtie_gffcompare_ballgown pipeline or HISAT2_SAMtools_Stringtie_PrepDEanalysis.py_DESeq2 pipeline. The first few steps are command line arguments and require installation of the following softwares. See Reference section for details on each software.
 
 `FASTQC`
 `HISAT2`
@@ -17,10 +17,11 @@ The sample data provided by JHU tools (HISAT2 and Stringtie) used for the analys
 ### To download the expanded dataset, several options are presented
 **To get the complete list of samples with paired end RNA reads
 
-* can ftp to the following website and perform a recursive download
- `ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR188/`
+* can ftp to the following website and perform a recursive download(limited by network capacity both locally and host's)
+ `wget -cr ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR188/`
  
-  or individual samples for example: `ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR188/ERR188021/ERR188021_1.fastq.gz`	
+  **or individual samples for example: 
+  `wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR188/ERR188021/ERR188021_1.fastq.gz`	
 
 * At European Nucleotide Archive (ENA) search for ERP001942
 https://www.ebi.ac.uk/ena/data/view/PRJEB3366
@@ -33,11 +34,13 @@ https://www.ebi.ac.uk/arrayexpress/
 https://www.ebi.ac.uk/arrayexpress/experiments/E-GEUV-1/samples/?full=true
 * or at command line
 `curl -L "https://www.ebi.ac.uk/arrayexpress/files/E-GEUV-1/E-GEUV-1.sdrf.txt">geuvadis_complete_phenodata.txt`
+**To process the downloaded datatable into a subset with just 3 columns of interest
  * `wc -l geuvadis_complete_phenodata.txt` 
  * `awk -F "\t" '{print $NF}' geuvadis_complete_phenodata.txt | wc -l`
  * `awk -F "\t" '{print $34 " " $7 " " $36 "  "}' geuvadis_complete_phenodata.txt >geuvadis_3columns.txt`
  * `awk -F "\t" '{print $1 " " $2 " " $3}' geuvadis_3columns.txt`
- * `sed -i 's/^Com.*$/ids \t sex \t population/' geuvadis_3columns.txt`
+ * `sed -i 's/^Com.*$/ids " " sex " " population/' geuvadis_3columns.txt` 
+ * or `sed -i 's/^Com.*$/ids \t sex \t population/' geuvadis_3columns.txt`
 
 To be consistent with Dave Tang's or JHU tutorial the relevant fields in the table for our purposes are "Characteristics[sex]"==gender of individual, "Characteristics[ancestry category] or Factor Value[ancestry category]"==geographic name of population, "Comment[ENA_RUN]"==sample names, "Comment[FASTQ_URI]"==sample file name and ftp path for download
 And thus you can construct a new data table with just the relevant information as described above using bash or Python and R below
@@ -48,7 +51,7 @@ And thus you can construct a new data table with just the relevant information a
     * import pandas as pd
     * geuvadis=pd.read_csv("geuvadis_complete_phenodata.txt", sep="\t", header=0)
     * geuvadis.shape
-    (924, 37)
+    * **The above should output: (924, 37)
     * geuvadis.iloc[0,:]
     * geuvadis.columns
     * geuvadis.iloc[0,33] sample name
@@ -119,6 +122,13 @@ Start at: https://genome.ucsc.edu/cgi-bin/hgTables and then choose as follows
 
 https://genome.ucsc.edu/cgi-bin/hgTables?hgsid=764817289_W7uU8Aj03hotPfShgOJGHr2RDr1M&clade=mammal&org=Human&db=hg38&hgta_group=genes&hgta_track=refS$
 
+### To sort and convert the sam files into bam files usig samtools
+`samtools sort -@ 4 -o ERR188428_chrX.bam ERR188428_chrX.sam`
+**explanations of options arguments
+* -@ 4: is the key value pair of CPU threads to use
+* -o: is to specify the output filename
+* last is the name of input file
+
 ### To perform transcriptome assembly with Stringtie
 ** Once samples are mapped or aligned onto a reference genome, then Stringtie can be used to assemble the transcriptome.
 An example assembly command with Stringtie using the JHU sample dataset(descibed above)
@@ -133,11 +143,73 @@ An example assembly command with Stringtie using the JHU sample dataset(descibed
 * -o: output file path and name
 * -e: this option is needed for DESEQ2. read bundles with no match to reference will be skipped http://ccb.jhu.edu/software/stringtie/index.shtml?t=manual#deseq
 
-**and subsequently to merge the transcripts (requires a mergelist)
+**and subsequently to merge the transcripts (requires a mergelist text file)
 `stringtie --merge -p 4 -G chrX_data/genes/chrX.gtf -o stringtie_merged.gtf chrX_data/mergelist.txt`
 
+### To summarize the assembled transcript in comparison to reference genes
+`gffcompare -r chrX_data/genes/chrX.gtf -G -o merged stringtie_merged.gtf`
+
+# Installation of softwares in Linux Ubuntu 18.04LTS
+** For convenience in using the binaries it is desirable, after installation, to link them to /usr/local/bin(this varies with OS you are using) so that they can be invoked without specifing their full path.
+`ln -s /<full>/<path>/<to>/<file> /usr/local/bin`
+
+### FASTQC (precompiled binary). It is useful for quality control of RNAseq of samples
+https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc
+Downloaded FastQC v0.11.8 (Win/Linux zip file)
+`unzip fastqc_v0.11.8.zip`
+**make binary executable
+`chmod 755 fastq`
+** To launch GUI
+`./fastqc`
+** To link it to /usr/local/bin
+`ln -s ~/Desktop/FastQC/fastqc /usr/local/bin `
+
+### HISAT2 (precompiled binary)
+`wget -c ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip`
+`unzip hisat2-2.1.0-Linux_x86_64.zip`
+**To link it to /usr/local/bin
+`ln -s ~/Desktop/HISAT2/hisat2-2.1.0/* /usr/local/bin`
+
+### Samtools (from source file, requires build. Alternatively, there is debian package but an earlier version)
+`wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2`
+`tar -tvf samtools-1.9.tar.bz2`
+`cd samtools-1.9.tar.bz2`
+`./configure` **another option is `./configure --prefix=/where/to/install`
+`make`
+** it took 40seconds
+`sudo make install`
+** To uninstall if needed
+`sudo make uninstall`
+** to check the install steps
+`make -n install`
+**Linking to /usr/local/bin is unnecessary as the installation procedure moves the necessary binaries to appropriate folder 
+
+### Stringtie (precompiled binary)
+`wget http://ccb.jhu.edu/software/stringtie/dl/stringtie-2.0.1.Linux_x86_64.tar.gz`
+`tar -xzvf stringtie-2.0.1.Linux_x86_64.tar.gz`
+`cd stringtie-2.0.1.Linux_x86_64`
+`ln -s ~/Desktop/stringtie-2.0.1.Linux_x86_64/stringtie /usr/local/bin`
+
+### GFFCOMPARE
+`git clone https://github.com/gpertea/gclib`
+`git clone https://github.com/gpertea/gffcompare`
+`cd gffcompare`
+`make release`
+`ln -s ~/Desktop/gffcompare/* /usr/local/bin`
+** may want to remove the unnecessary links later or initially select specific files to link instead of whole folder
+
+**Alternatively, a precompiled version can be downloaded
+`wget http://ccb.jhu.edu/software/stringtie/dl/gffcompare-0.11.4.Linux_x86_64.tar.gz`
+`tar xzvf gffcompare-0.11.4.Linux_x86_64.tar.gz`
+`cd gffcompare-0.11.4.Linux_x86_64`
 
 
+
+### PrepDE.py (JHU script to prepare a count matrix of Stringtie output for DESeq2 or EdgeR)
+wget http://ccb.jhu.edu/software/stringtie/dl/prepDE.py
+chmod 755 prepDE.py
+**usage
+`python2 prepDE.py -i sample_lst.txt`
 
 
 # References
@@ -148,4 +220,8 @@ An example assembly command with Stringtie using the JHU sample dataset(descibed
 * https://en.wikipedia.org/wiki/1000_Genomes_Project
 * CEPH https://www.coriell.org/1/NIGMS/Collections/CEPH-Resources. https://en.wikipedia.org/wiki/Fondation_Jean_Dausset-CEPH
 * Dave Tang's tutorial blog https://davetang.org/muse/2017/10/25/getting-started-hisat-stringtie-ballgown/
-* HISAT2 https://ccb.jhu.edu/software/hisat2/index.shtml
+* FASTQC (version: 0.11.8) https://www.bioinformatics.babraham.ac.uk/projects/download.html#fastqc
+* HISAT2(version: 2.1.0) https://ccb.jhu.edu/software/hisat2/index.shtml
+* Stringtie (version: 2.0.1) http://ccb.jhu.edu/software/stringtie/index.shtml 
+* Gffcompare (version: ) http://ccb.jhu.edu/software/stringtie/gff.shtml#gffcompare or https://github.com/gpertea/gffcompare
+
