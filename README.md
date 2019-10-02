@@ -15,7 +15,7 @@ The sample data provided by JHU tools (HISAT2 and Stringtie) used for the analys
 
 # Customizing the reference files required by aligners and assemblers and expanded sample data
 ### To download the expanded dataset, several options are presented
-**To get the complete list of samples with paired end RNA reads
+**To get the complete set of samples with paired end RNA reads
 
 * can ftp to the following website and perform a recursive download(limited by network capacity both locally and host's)
  `wget -cr ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR188/`
