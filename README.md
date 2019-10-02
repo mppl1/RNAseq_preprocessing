@@ -103,7 +103,7 @@ Although the reference genome is not used in this tutorial/analysis, it can be d
 * -S: file to write SAM alignments to. If not specified it is sent to stdout or console
 
 
-#### It is possible to download the whole reference genes (refseq or refgene) from the UCSC genome browser
+#### It is possible to download the whole reference genes (refseq or refgene) from the UCSC genome browser. This file is used by Stringtie to guide the transcriptome assembly (in the form of a "GTF" or "GFF" file)
 
 Start at: https://genome.ucsc.edu/cgi-bin/hgTables and then choose as follows
 * clade: Mammal
