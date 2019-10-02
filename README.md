@@ -9,7 +9,7 @@ These are tutorials on a subset of tools available for processing raw RNAseq dat
 
 
 The description and tutorial of the tools was originally published here: https://www.nature.com/articles/nprot.2016.095
-The sequenced samples used in tutorial was from original material [Lappalainen et al. 2013 Nature](http://dx.doi.org/10.1038/nature12531) and is accessible[PMID:24037378](https://www.ncbi.nlm.nih.gov/pubmed/24037378). A useful portal to explore the dataset from original study is provided at https://www.ebi.ac.uk/Tools/geuvadis-das/. The dataset consists of lymphoblastic cell lines derived from 465 individuals. The individuals are either male or female and from one of five different populations: CEPH (CEU--Utah residents of Western and Northern European ancestry), Finns (FIN--Finland), British (GBR), Toscani (TSI--Italy) and Yoruba (YRI--Nigeria).
+The sequenced samples used in tutorial was from original material [Lappalainen et al. 2013 Nature](http://dx.doi.org/10.1038/nature12531) and is accessible [PMID:24037378](https://www.ncbi.nlm.nih.gov/pubmed/24037378). A useful portal to explore the dataset from original study is provided at https://www.ebi.ac.uk/Tools/geuvadis-das/. The dataset consists of lymphoblastic cell lines derived from 465 individuals. The individuals are either male or female and from one of five different populations: CEPH (CEU--Utah residents of Western and Northern European ancestry), Finns (FIN--Finland), British (GBR), Toscani (TSI--Italy) and Yoruba (YRI--Nigeria). 
 
 The sample data provided by JHU tools (HISAT2 and Stringtie) used for the analysis in tutorial(https://www.nature.com/articles/nprot.2016.095) is a subset of samples used in the original study. And the subset of samples (12) are further filtered for reads that map onto human chromosome X, for ease of analysis and reducing computational demand. So the index files provided by HISAT2 or Stringtie during installation(ex. chrX_tran.1.ht2...,which are used by HISAT2 for mapping) and reference annotated transcriptome provided by Stringtie during installation (ex. chrX.gtf, which is used by Stringtie for reference guided transcriptome assembly) are also of chromosome X(note: typically, homonid males have 1 X chromosome). For details of installing the bioinformatic tools and running the example dataset, please refer to Dave Tang's excellent [tutorial](https://davetang.org/muse/2017/10/25/getting-started-hisat-stringtie-ballgown/). In this github project are presented options to expand the region covered, see below. And also a way to automate the pipeline (from aligning the reads, to sorting and conversion to bam file type, transcriptome assembly), a bash script is provided that can be modified.
 
@@ -79,13 +79,14 @@ And thus you can construct a new data table with just the relevant information a
     * write.table(geuvadisdf, "geuvadisdf_phenodata.csv", sep=",")
 
 ### It is possible to generate the index files yourself (computationally intensive! 160GB of RAM for whole genome) using HISAT2
- ** Another option is to use the aligner: STAR
+ ** Another option(still computationally demanding) is to use the aligner/mapper: STAR
 
 HISAT2 will use the reference genome for generating index files
-Although the reference genome is not used in this tutorial analysis it can be downloaded as follows
+Although the reference genome is not used in this tutorial/analysis, it can be downloaded as follows
 `curl -L "http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz" > hg38.fa.gz`
 
-** However, JHU has these indexes available ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/data/grch38.tar.gz
+** However, and fortunately JHU has these whole genome chromosome indexes available for download
+* `wget -c ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/data/grch38.tar.gz`
 
 ### Once index files are generated or available, then the samples can be aligned or mapped using the index files
   **Here is an example alignment command with HISAT2 using the JHU sample dataset(descibed above)
