@@ -136,6 +136,10 @@ An example assembly command with Stringtie using the JHU sample dataset(descibed
 
 `stringtie map/ERR188428_chrX.bam -l ERR188428 -p 4 -e -G chrX_data/genes/chrX.gtf -o assembly/ERR188428_chrX.gtf`
 
+**If assembly for downstream analysis with ballgown then
+`stringtie ERR188428_chrX.bam -l ERR188428 -p 4 -G chrX_data/genes/chrX.gtf  -o assembly/ERR188428_chrX.gtf`
+
+
 **explanations of options arguments**
 * path to input file
 * -l:prefix for output transcripts 
@@ -145,10 +149,16 @@ An example assembly command with Stringtie using the JHU sample dataset(descibed
 * -e: this option is needed for DESEQ2. read bundles with no match to reference will be skipped http://ccb.jhu.edu/software/stringtie/index.shtml?t=manual#deseq
 
 **and subsequently to merge the transcripts (requires a mergelist text file)
+`ls -1 assembly/* | cat > mergelist.txt` **To generate a merge list text file
 `stringtie --merge -p 4 -G chrX_data/genes/chrX.gtf -o stringtie_merged.gtf chrX_data/mergelist.txt`
 
 ### To summarize the assembled transcript in comparison to reference genes
 `gffcompare -r chrX_data/genes/chrX.gtf -G -o merged stringtie_merged.gtf`
+
+## To prepare mapped and assembled transcripts for ballgown analysis
+`[ -d ballgown ] || mkdir ballgown`
+`stringtie -e -B -p 8 -G stringtie_merged.gtf -o ballgown/ERR188044/ERR188044_chrX.gtf map/ERR188044_chrX.bam`
+
 
 # Installation of softwares in Linux Ubuntu 18.04LTS
 ** For convenience in using the binaries it is desirable, after installation, to link them to /usr/local/bin(this varies with OS you are using) so that they can be invoked without specifing their full path.
@@ -210,6 +220,12 @@ Downloaded FastQC v0.11.8 (Win/Linux zip file)
 wget http://ccb.jhu.edu/software/stringtie/dl/prepDE.py
 chmod 755 prepDE.py
 **usage
+** first generate a sample_lst.txt that contains sample name and its path (relative or absolute) at each line for ex.
+`ERR188044 assembly/ERR188044_chrX.gtf`
+*
+*
+*
+**Then run the script with text file containing the sample name and its corresponding path
 `python2 prepDE.py -i sample_lst.txt`
 
 
