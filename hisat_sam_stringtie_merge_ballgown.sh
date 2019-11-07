@@ -415,13 +415,13 @@ rm map/*.sam
 
 
 
-# This is test script to determine if I can automate the Stringtie analysis, especially for many sample case
+# This script to automate the Stringtie analysis, especially for many sample case
 # The general syntax is
 # stringtie map/ERR188044_chrX.bam -l ERR188044 -p 4 -e -G chrX_data/genes/chrX.gtf -o assembly/ERR188044_chrX.gtf
 
 
 #for files in $( ls -1 testdir2/*.bam | tr '\n' '\0' | xargs -0 -n 1 basename | cat );
-
+# This if statement structure is to determine if user specified to run Stringtie with the use of "-e" option
 if [ -z "$e" ];
         then    echo  " Then therefore no (-e) option is used"
 	for bamfiles in $( ls -1 map/*.bam | cat );
@@ -497,8 +497,19 @@ fi
 
 
 ########## First step is to generate a text file containing the "assembly/samples_n" name
+# Initially, I automatically generated the mergelist.txt
+#ls -1 assembly/* | cat > mergelist.txt
+# but 
+# I decided to check if user already has mergelist.txt in directory. 
+# This assumes that the file if it exists is in the current directory
 
-ls -1 assembly/* | cat > mergelist.txt
+
+mergefilel=$(ls | grep -e "mergelist.txt")
+if [ -z "$mergefilel"  ];
+        then ls -1 assembly/* | cat > mergelist.txt
+else echo "A mergelist.txt file has been found in current directory. So it will not be automatically generated"
+fi
+
 
 ########### To generate a specific subset of samples for mergelist ########
 #  Then manually generate the text file  in the format
