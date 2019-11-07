@@ -252,7 +252,7 @@ echo # blank
 				# HISAT2 #
 
 # $ hisat2 --version
-# /home/muluye/Desktop/Projects/RNAseqPreprocess/HISAT2/hisat2-2.1.0/hisat2-align-s version 2.1.0
+#Projects/RNAseqPreprocess/HISAT2/hisat2-2.1.0/hisat2-align-s version 2.1.0
 # 64-bit
 # Built on login-node03
 # Wed Jun  7 15:53:42 EDT 2017
