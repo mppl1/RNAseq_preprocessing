@@ -22,6 +22,7 @@
 # The genome index files are located at and have prefix :     "chrX_data/indexes/chrX_tran"
 # The  samples are located at :        		              "chrX_data/samples"
 
+# Testing git update remotely
 
 ################################# Optional ################################
 ##### Can download the chrX_data folder from JHU and untar it
