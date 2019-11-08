@@ -23,7 +23,7 @@
 # The  samples are located at :        		              "chrX_data/samples"
 
 # Testing git update remotely
-
+# Second Test
 ################################# Optional ################################
 ##### Can download the chrX_data folder from JHU and untar it
 ##### At least the indexes and reference gene annotation can be downloaded
